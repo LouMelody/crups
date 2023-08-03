@@ -11,6 +11,11 @@ do
 var game = new Game(money);
 // Game loop
 while(true) {
+    Reset:
+    if(game.money <= 0) {
+        Console.WriteLine("You bankrupt, See you !");
+        break;
+    }
     Console.WriteLine($"now you have {game.money}$");
     int bet = game.ReadBet();
     if(bet > game.money) {
@@ -21,29 +26,57 @@ while(true) {
     switch(game.ComeOut()) {
         case State.Win:
             game.money += bet;
-            if(AskContinue())
+            if(game.AskContinue())
                 goto Owa;
             break;
         case State.Lose:
             game.money -= bet;
-            if(AskContinue())
+            if(game.AskContinue())
                 goto Owa;
             break;
         case State.Continue:
+            bool playerTurn = false;
+            while(true) {
+                if(playerTurn) {
+                    Console.WriteLine("PLAYER ROLL!");
+                    switch(game.Come()) {
+                        case State.Win:
+                            game.money += bet;
+                            if(game.AskContinue())
+                                goto Owa;
+                            goto Reset;
+                        case State.Lose:
+                            game.money -= bet;
+                            if(game.AskContinue())
+                                goto Owa;
+                            goto Reset;
+                        case State.Continue:
+                            break;
+                    }
+                    playerTurn = false;
+                }
+                else {
+                    Console.WriteLine("COM ROLL!");
+                    switch(game.Come()) {
+                        case State.Win:
+                            game.money -= bet;
+                            if(game.AskContinue())
+                                goto Owa;
+                            goto Reset;
+                        case State.Lose:
+                            game.money += bet;
+                            if(game.AskContinue())
+                                goto Owa;
+                            goto Reset;
+                        case State.Continue:
+                            break;
+                    }
+                    playerTurn = true;
+                }
+            }
             break;
     }
 }
 // Eng Game loop
 Owa:
-bool AskContinue() {
-    string value = "";
-    while(true)
-    {
-        Console.Write("You want to continue ? (y/n)>");
-        value = Console.ReadLine();
-        if(value.Trim() == "y")
-            return false;
-        else if(value.Trim() == "n")
-            return true;
-    }
-}
+;

@@ -23,7 +23,16 @@ internal class Game {
         }
     }
     internal State Come() {
-        return State.Win;
+        RollPrompt();
+        var value = dice.PrintRollAndValue();
+
+        if(value == 7) {
+            return State.Lose;
+        }
+        if(value == point) {
+            return State.Win;
+        }
+        return State.Continue;
     }
 
     internal void RollPrompt() {
@@ -31,6 +40,19 @@ internal class Game {
         Console.ReadKey(true);
     }
 
+    internal bool AskContinue() {
+        string value = "";
+        while(true)
+        {
+            Console.WriteLine($"remain {money}$");
+            Console.Write("You want to continue ? (y/n)>");
+            value = Console.ReadLine();
+            if(value.Trim() == "y")
+                return false;
+            else if(value.Trim() == "n")
+                return true;
+        }
+}
     internal int ReadBet() {
         int bet = 0;
         do
